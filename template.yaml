@@ -1,0 +1,374 @@
+# HTTP 端口
+# port: 7890
+
+# SOCKS5 端口
+# socks-port: 7891
+
+# HTTP(S) and SOCKS5 server on the same port
+mixed-port: 7890
+
+# Linux 及 macOS 的 redir 端口
+# redir-port: 7892
+
+allow-lan: false
+
+# 仅适用于设置 allow-lan 为 true 时
+# "*": 绑定所有 IP 地址
+# 192.168.122.11: 绑定单个 IPv4 地址
+# "[aaaa::a8aa:ff:fe09:57d8]": 绑定单个 IPv6 地址
+# bind-address: "*"
+
+# Rule / Global / Direct (默认为 Rule 模式)
+mode: Rule
+
+# 设置输出日志的等级 (默认为 info)
+# info / warning / error / debug / silent
+log-level: info
+
+# RESTful API for clash
+external-controller: 127.0.0.1:9090
+
+# you can put the static web resource (such as clash-dashboard) to a directory, and clash would serve in `${API}/ui`
+# input is a relative path to the configuration directory or an absolute path
+# external-ui: folder
+
+# Secret for RESTful API (Optional)
+# secret: ""
+
+# 实验性功能
+experimental:
+  ignore-resolve-fail: true # 忽略 DNS 解析失败，默认值为true
+  # interface-name: en0 # 出站接口名称
+
+# 本地 SOCKS5/HTTP(S) 服务器认证
+# authentication:
+#  - "user1:pass1"
+#  - "user2:pass2"
+
+# 实验性 hosts, 支持通配符（如 *.clash.dev 甚至 *.foo.*.examplex.com ）
+# 静态域的优先级高于通配符域（foo.example.com > *.example.com）
+hosts:
+  # "mtalk.google.com": 108.177.125.188
+  # '*.clash.dev': 127.0.0.1
+  # 'alpha.clash.dev': '::1'
+
+# DNS 服务器配置(可选；若不配置，程序内置的 DNS 服务会被关闭)
+dns:
+  enable: true
+  listen: 0.0.0.0:63521
+  ipv6: false # 当此选项为 false 时, AAAA 请求将返回空
+
+  # 以下填写的 DNS 服务器将会被用来解析 DNS 服务的域名
+  # 仅填写 DNS 服务器的 IP 地址
+  default-nameserver:
+    - 1.2.4.8
+    - 8.8.8.8
+    - 223.5.5.5
+    - 114.114.114.114
+    - 119.29.29.29
+  enhanced-mode: redir-host # 或 fake-ip
+  fake-ip-range: 198.18.0.1/16 # Fake IP 地址池 (CIDR 形式)
+  # use-hosts: true # 查询 hosts 并返回 IP 记录
+
+  # 在以下列表的域名将不会被解析为 fake ip，这些域名相关的解析请求将会返回它们真实的 IP 地址
+  fake-ip-filter:
+    - "*.lan"
+    - "*.local"
+
+  # 支持 UDP / TCP / DoT / DoH 协议的 DNS 服务，可以指明具体的连接端口号。
+  # 所有 DNS 请求将会直接发送到服务器，不经过任何代理。
+  # Clash 会使用最先获得的解析记录回复 DNS 请求
+  nameserver:
+    # 阿里云
+    - https://dns.alidns.com/dns-query
+
+    # rubyfish
+    - https://rubyfish.cn/dns-query
+
+    # OpenDNS
+    - https://doh.opendns.com/dns-query
+
+    # shoushou
+    - https://doh.dns.sb/dns-query
+    - tls://dot.sb
+
+    # DNSPod
+    - tls://dns.pub
+    # - tls://doh.pub
+
+  # 当 fallback 参数被配置时, DNS 请求将同时发送至上方 nameserver 列表和下方 fallback 列表中配置的所有 DNS 服务器.
+  # 当解析得到的 IP 地址的地理位置不是 CN 时，clash 将会选用 fallback 中 DNS 服务器的解析结果。
+  fallback:
+    # Google
+    - https://dns.google/dns-query
+
+    # Cloudflare
+    - tls://1dot1dot1dot1.cloudflare-dns.com
+    - tls://1.0.0.1
+    - tls://1.1.1.1
+
+  # 如果使用 nameserver 列表中的服务器解析的 IP 地址在下方列表中的子网中，则它们被认为是无效的，
+  # Clash 会选用 fallback 列表中配置 DNS 服务器解析得到的结果。
+  #
+  # 当 fallback-filter.geoip 为 true 且 IP 地址的地理位置为 CN 时，
+  # Clash 会选用 nameserver 列表中配置 DNS 服务器解析得到的结果。
+  #
+  # 当 fallback-filter.geoip 为 false, 如果解析结果在 fallback-filter.ipcidr 范围内，
+  # Clash 会选用 nameserver 列表中配置 DNS 服务器解析得到的结果。
+  #
+  # 采取以上逻辑进行域名解析是为了对抗 DNS 投毒攻击。
+  fallback-filter:
+    geoip: false
+    ipcidr:
+    # - 240.0.0.0/4
+
+proxies:
+  # 支持的协议及加密算法示例请查阅 Clash 项目 README 以使用最新格式：https://github.com/Dreamacro/clash/blob/master/README.md
+
+  # Shadowsocks 支持的加密方式:
+  #   aes-128-gcm aes-192-gcm aes-256-gcm
+  #   aes-128-cfb aes-192-cfb aes-256-cfb
+  #   aes-128-ctr aes-192-ctr aes-256-ctr
+  #   rc4-md5 chacha20-ietf xchacha20
+  #   chacha20-ietf-poly1305 xchacha20-ietf-poly1305
+
+  # - name: "ss3"
+  #   type: ss
+  #   server: server
+  #   port: 443
+  #   cipher: chacha20-ietf-poly1305
+  #   password: "password"
+  #   plugin: v2ray-plugin
+  #   plugin-opts:
+  #     mode: websocket # no QUIC now
+  #     tls: true # wss
+  #     skip-cert-verify: true
+  #     host: bing.com
+  #     path: "/"
+  #     mux: true
+  #     headers:
+  #       custom: value
+
+  # socks5
+  # - name: "socks"
+  # type: socks5
+  # server: server
+  # port: 443
+  # username: username
+  # password: password
+  # tls: true
+  # skip-cert-verify: true
+  # udp: true
+
+  # http
+  # - name: "http"
+  # type: http
+  # server: server
+  # port: 443
+  # username: username
+  # password: password
+  # tls: true # https
+  # skip-cert-verify: true
+  # sni: custom.com
+
+  # ShadowsocksR
+  # The supported ciphers (encryption methods): all stream ciphers in ss
+  # The supported obfses:
+  #   plain http_simple http_post
+  #   random_head tls1.2_ticket_auth tls1.2_ticket_fastauth
+  # The supported supported protocols:
+  #   origin auth_sha1_v4 auth_aes128_md5
+  #   auth_aes128_sha1 auth_chain_a auth_chain_b
+  # - name: "ssr"
+  #   type: ssr
+  #   server: server
+  #   port: 443
+  #   cipher: chacha20-ietf
+  #   password: "password"
+  #   obfs: tls1.2_ticket_auth
+  #   protocol: auth_sha1_v4
+  # obfs-param: domain.tld
+  # protocol-param: "#"
+  # udp: true
+
+  # VMess
+  # - name: "v2ray"
+    # type: vmess
+    # server: v2ray.com
+    # port: 443
+    # uuid: 
+    # alterId: 128
+    # cipher: auto
+    # udp: true
+    # tls: true
+    # skip-cert-verify: true
+    # network: ws
+    # ws-path: /path
+    # ws-headers: # 这一行后面不要写东西
+    #   Host: v2ray.com # 填你的主机名
+
+# 代理组策略
+# 策略组示例请查阅 Clash 项目 README 以使用最新格式：https://github.com/Dreamacro/clash/blob/master/README.md
+proxy-groups:
+  # 代理节点选择
+  - name: "PROXY"
+    type: select
+    proxies: []
+
+  # 白名单模式 PROXY，黑名单模式 DIRECT
+  - name: "Final"
+    type: select
+    proxies:
+      - "DIRECT"
+      - "PROXY"
+
+  # relay chains the proxies. proxies shall not contain a relay. No UDP support.
+  # Traffic: clash <-> http <-> vmess <-> ss1 <-> ss2 <-> Internet
+  # - name: "relay"
+  #   type: relay
+  #   proxies:
+  #     - http
+  #     - vmess
+  #     - ss1
+  #     - ss2
+
+# 规则集
+rule-providers:
+  reject:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt"
+    path: ./ruleset/reject.yaml
+    interval: 86400
+
+  icloud:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt"
+    path: ./ruleset/icloud.yaml
+    interval: 86400
+
+  apple:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt"
+    path: ./ruleset/apple.yaml
+    interval: 86400
+
+  google:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/google.txt"
+    path: ./ruleset/google.yaml
+    interval: 86400
+
+  proxy:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt"
+    path: ./ruleset/proxy.yaml
+    interval: 86400
+
+  direct:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
+    path: ./ruleset/direct.yaml
+    interval: 86400
+
+  private:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt"
+    path: ./ruleset/private.yaml
+    interval: 86400
+
+  gfw:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt"
+    path: ./ruleset/gfw.yaml
+    interval: 86400
+
+  greatfire:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/greatfire.txt"
+    path: ./ruleset/greatfire.yaml
+    interval: 86400
+
+  tld-not-cn:
+    type: http
+    behavior: domain
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/tld-not-cn.txt"
+    path: ./ruleset/tld-not-cn.yaml
+    interval: 86400
+
+  telegramcidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt"
+    path: ./ruleset/telegramcidr.yaml
+    interval: 86400
+
+  cncidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt"
+    path: ./ruleset/cncidr.yaml
+    interval: 86400
+
+  lancidr:
+    type: http
+    behavior: ipcidr
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt"
+    path: ./ruleset/lancidr.yaml
+    interval: 86400
+
+  applications:
+    type: http
+    behavior: classical
+    url: "https://cdn.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt"
+    path: ./ruleset/applications.yaml
+    interval: 86400
+
+# 规则
+rules:
+  #####################################################################
+  # 规则集
+  - RULE-SET,applications,DIRECT
+  - RULE-SET,private,DIRECT
+  - RULE-SET,reject,REJECT
+  - RULE-SET,tld-not-cn,PROXY
+  - RULE-SET,gfw,PROXY
+  - RULE-SET,greatfire,PROXY
+  - RULE-SET,telegramcidr,PROXY
+  - MATCH,Final
+
+# Clash for Windows
+cfw-bypass:
+  - qq.com
+  - music.163.com
+  - "*.music.126.net"
+  - localhost
+  - 127.*
+  - 10.*
+  - 172.16.*
+  - 172.17.*
+  - 172.18.*
+  - 172.19.*
+  - 172.20.*
+  - 172.21.*
+  - 172.22.*
+  - 172.23.*
+  - 172.24.*
+  - 172.25.*
+  - 172.26.*
+  - 172.27.*
+  - 172.28.*
+  - 172.29.*
+  - 172.30.*
+  - 172.31.*
+  - 192.168.*
+  - <local>
+cfw-latency-timeout: 1000
