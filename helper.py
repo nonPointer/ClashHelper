@@ -2,6 +2,7 @@ import yaml
 import requests
 import sys
 import os
+import socket
 
 from yaml.loader import FullLoader
 
@@ -44,10 +45,11 @@ class Site:
                 self.data = None
                 self.log("节点组为空")
 
-    def purge(self):
+def purge(self):
         self.nodes = self.data['proxies']
         nodes_good = []
 
+        # blacklist keywords
         for node in self.nodes:
             for k in self.exclusion:
                 if k in node['name'].lower() or k in node['server'].lower():
@@ -55,13 +57,25 @@ class Site:
                     self.log("Drop: {}".format(node['name']))
                     break
 
+        # whitelist keywords
         for node in self.nodes:
             for k in self.inclusion:
                 if k in node['name'].lower() or k in node['server'].lower():
                     nodes_good.append(node)
-                    site.log("Take: {}".format(node['name']))
+                    # site.log("Take: {}".format(node['name']))
                     break
 
+        # deduplicate
+        used = set()
+        for node in nodes_good:
+            ip = socket.getaddrinfo(node['server'], None)[0][4][0]
+            if ip in used:
+                self.log("Drop: {}".format(node['name']))
+                nodes_good.remove(node)
+            else:
+                site.log("Take: {}".format(node['name']))
+                used.add(ip)
+        
         self.nodes = nodes_good
 
     def get_titles(self) -> list[str]:
