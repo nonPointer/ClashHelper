@@ -45,7 +45,7 @@ class Site:
                 self.data = None
                 self.log("节点组为空")
 
-def purge(self):
+    def purge(self):
         self.nodes = self.data['proxies']
         nodes_good = []
 
