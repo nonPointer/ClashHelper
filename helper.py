@@ -17,20 +17,20 @@ if len(sys.argv) < 2 or len(sys.argv) > 3:
 
 class Site:
 
-    def __init__(self, name: str, group: str, url: str, inclusion: list, exclusion: list):
+    def __init__(self, name: str, group: str, url: str, inclusion: list, exclusion: list, dedup: bool):
         self.name = name
         self.group = group
         self.url = url
         self.inclusion = inclusion
         self.exclusion = exclusion
         self.nodes = []
+        self.dedup = dedup
 
         try:
             headers = {
                 "User-Agent": "ClashForAndroid/2.4.14",  # V2board 根据 UA 下发配置
             }
             r = requests.get(url, headers=headers)
-            assert r.status_code == 200
             self.data = yaml.load(r.text, Loader=FullLoader)
             # 缓存
             with open("{}.yaml".format(group), "w", encoding="utf-8") as f:
@@ -67,27 +67,35 @@ class Site:
                     break
 
         # deduplicate
-        used = set()
-        for node in nodes_good:
-            ip = socket.getaddrinfo(node['server'], None)[0][4][0]
-            if ip in used:
-                self.log("Drop: {}".format(node['name']))
-                nodes_good.remove(node)
-            else:
-                site.log("Take: {}".format(node['name']))
-                used.add(ip)
-        
+        if self.dedup:
+            used = set()
+            for node in nodes_good:
+                ip = socket.getaddrinfo(node['server'], None)[0][4][0]
+                if ip in used:
+                    self.log("Drop: {}, dup!".format(node['name']))
+                    nodes_good.remove(node)
+                else:
+                    site.log("Take: {}".format(node['name']))
+                    used.add(ip)
+        else:
+            self.log("Dedup disabled")
+            for node in nodes_good:
+                self.log("Take: {}".format(node['name']))
+
         self.nodes = nodes_good
 
-    def get_titles(self) -> list[str]:
+    def get_titles(self):
         return list(map(lambda x: x['name'], self.nodes))
 
     def log(self, message: str):
         print("[{}] {}".format(self.name, message))
 
 
-def from_config(config: list) -> Site:
-    return Site(config['name'], config['group'], config['url'], config['inclusion'], config['exclusion'])
+def from_config(config: dict) -> Site:
+    # enable dedup by default
+    if "dedup" not in config:
+        config['dedup'] = True
+    return Site(config['name'], config['group'], config['url'], config['inclusion'], config['exclusion'], config['dedup'])
 
 
 with open("sites.yaml", "r", encoding="utf-8") as f:
