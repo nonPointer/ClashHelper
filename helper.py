@@ -31,6 +31,7 @@ class Site:
                 "User-Agent": "ClashForAndroid/2.4.14",  # V2board 根据 UA 下发配置
             }
             r = requests.get(url, headers=headers)
+            assert r.status_code == 200
             self.data = yaml.load(r.text, Loader=FullLoader)
             # 缓存
             with open("{}.yaml".format(group), "w", encoding="utf-8") as f:
