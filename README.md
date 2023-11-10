@@ -9,6 +9,10 @@
 * 基于域名解析地址的节点去重：丢弃域名一致、解析地址一致的节点。
 + 注意：输出的配置文件不包含模板中的注释，不影响使用。
 
+## 使用场景
+
+搭配 [Github Actions](https://github.com/marketplace/actions/deploy-to-gist) 的 [cron jobs](https://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows) 使用，推送配置文件至 [Github Gist](https://gist.github.com/)。将 Gist 的 `raw` 链接配置为 Clash 客户端订阅链接即可。
+
 ## User Guide
 
 使用前需要将网站订阅信息写在 `sites.yaml` 内。
