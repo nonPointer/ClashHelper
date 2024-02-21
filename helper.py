@@ -80,7 +80,7 @@ class Site:
                         site.log("Take: {}".format(node['name']))
                         used.add(ip)
                 except:
-                    print(f"Failed to resolve node {node['name']}: {node['server']}")
+                    self.log(f"Failed to resolve node {node['name']}: {node['server']}")
         else:
             self.log("Dedup disabled")
             for node in nodes_good:
