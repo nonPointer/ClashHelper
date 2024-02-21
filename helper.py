@@ -71,13 +71,16 @@ class Site:
         if self.dedup:
             used = set()
             for node in nodes_good:
-                ip = socket.getaddrinfo(node['server'], None)[0][4][0]
-                if ip in used:
-                    self.log("Drop: {}, dup!".format(node['name']))
-                    nodes_good.remove(node)
-                else:
-                    site.log("Take: {}".format(node['name']))
-                    used.add(ip)
+                try:
+                    ip = socket.getaddrinfo(node['server'], None)[0][4][0]
+                    if ip in used:
+                        self.log("Drop: {}, dup!".format(node['name']))
+                        nodes_good.remove(node)
+                    else:
+                        site.log("Take: {}".format(node['name']))
+                        used.add(ip)
+                except:
+                    print(f"Failed to resolve node {node['name']}: {node['server']}")
         else:
             self.log("Dedup disabled")
             for node in nodes_good:
