@@ -28,7 +28,7 @@ class Site:
 
         try:
             headers = {
-                "User-Agent": "ClashForAndroid/2.4.14",  # V2board 根据 UA 下发配置
+                "User-Agent": "ClashForAndroid/2.5.12",  # V2board 根据 UA 下发配置
             }
             r = requests.get(url, headers=headers)
             assert r.status_code == 200
@@ -50,7 +50,6 @@ class Site:
     def purge(self):
         self.nodes = self.data['proxies']
         nodes_good = []
-
         # blacklist keywords
         for node in self.nodes:
             for k in self.exclusion:
@@ -73,12 +72,13 @@ class Site:
             for node in nodes_good:
                 try:
                     ip = socket.getaddrinfo(node['server'], None)[0][4][0]
-                    if ip in used:
+                    p = (ip, node['port'])
+                    if p in used:
                         self.log("Drop: {}, dup!".format(node['name']))
                         nodes_good.remove(node)
                     else:
                         site.log("Take: {}".format(node['name']))
-                        used.add(ip)
+                        used.add(p)
                 except:
                     self.log(f"Failed to resolve node {node['name']}: {node['server']}")
         else:
