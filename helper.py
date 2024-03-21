@@ -37,7 +37,6 @@ class Site:
             with open("{}.yaml".format(group), "w", encoding="utf-8") as f:
                 f.write(r.text)
         except Exception as e:
-            self.log("HTTP Error: {}".format(r.status_code))
             self.log("加载异常")
             if os.path.exists("{}.yaml".format(group)):
                 self.log("使用上次缓存")
