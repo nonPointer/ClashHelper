@@ -40,7 +40,7 @@ class Site:
                 f.write(r.text)
         except Exception as e:
             if status_code != 200:
-                self.log(f"HTTP Error: {r.status_code}")
+                self.log(f"HTTP Error: {status_code}")
             self.log("加载异常")
             if os.path.exists("{}.yaml".format(group)):
                 self.log("使用上次缓存")
