@@ -37,7 +37,7 @@ class Site:
             with open("{}.yaml".format(group), "w", encoding="utf-8") as f:
                 f.write(r.text)
         except Exception as e:
-            if r in vars():
+            if 'r' in vars():
                 print(f"HTTP Error: {r.status_code}")
             self.log("加载异常")
             if os.path.exists("{}.yaml".format(group)):
