@@ -126,4 +126,4 @@ for site in sites:
 
 output_file = sys.argv[2] if len(sys.argv) == 3 else "out.yaml"
 with open(output_file, "w", encoding="utf-8") as f:
-    f.write(yaml.dump(config, default_flow_style=False))
+    f.write(yaml.dump(config, default_flow_style=False, allow_unicode=True))
