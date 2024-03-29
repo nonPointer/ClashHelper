@@ -1,10 +1,10 @@
-import yaml
+from ruamel.yaml import YAML
 import requests
 import sys
 import os
 import socket
 
-from yaml.loader import FullLoader
+yaml = YAML()
 
 if len(sys.argv) < 2 or len(sys.argv) > 3:
     print("Usage:")
@@ -34,7 +34,7 @@ class Site:
             r = requests.get(url, headers=headers)
             status_code = r.status_code
             assert status_code == 200
-            self.data = yaml.load(r.text, Loader=FullLoader)
+            self.data = yaml.load(r.text)
             # 缓存
             with open("{}.yaml".format(group), "w", encoding="utf-8") as f:
                 f.write(r.text)
@@ -45,7 +45,7 @@ class Site:
             if os.path.exists("{}.yaml".format(group)):
                 self.log("使用上次缓存")
                 with open("{}.yaml".format(group), "r", encoding="utf-8") as f:
-                    self.data = yaml.load(f, Loader=FullLoader)
+                    self.data = yaml.load(f)
             else:
                 self.data = None
                 self.log("节点组为空")
@@ -106,7 +106,7 @@ def from_config(config: dict) -> Site:
 
 
 with open("sites.yaml", "r", encoding="utf-8") as f:
-    config = yaml.load(f, Loader=FullLoader)
+    config = yaml.load(f)
     sites = []
     for c in config:
         c['inclusion'] = list(map(lambda x: x.lower(), c['inclusion']))
@@ -116,7 +116,7 @@ with open("sites.yaml", "r", encoding="utf-8") as f:
 
 
 with open(sys.argv[1], "r", encoding="utf-8") as f:
-    config = yaml.load(f, Loader=FullLoader)
+    config = yaml.load(f)
 
 for site in sites:
     if site.data != None:
@@ -126,4 +126,4 @@ for site in sites:
 
 output_file = sys.argv[2] if len(sys.argv) == 3 else "out.yaml"
 with open(output_file, "w", encoding="utf-8") as f:
-    f.write(yaml.dump(config, default_flow_style=False, allow_unicode=True))
+    yaml.dump(config, f)
