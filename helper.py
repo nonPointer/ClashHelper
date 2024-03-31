@@ -124,6 +124,9 @@ for site in sites:
         config['proxies'] += site.nodes
         config['proxy-groups'][list(map(lambda x: x['name'], config['proxy-groups'])).index(site.group)]['proxies'] += site.get_titles()
 
+# 对节点名去重
+config['proxies'] = list({x['name']: x for x in config['proxies']}.values())
+
 output_file = sys.argv[2] if len(sys.argv) == 3 else "out.yaml"
 with open(output_file, "w", encoding="utf-8") as f:
     f.write(yaml.dump(config, default_flow_style=False, allow_unicode=True))
