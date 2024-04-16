@@ -53,29 +53,32 @@ class Site:
     def purge(self):
         self.nodes = self.data['proxies']
         nodes_good = []
-        # blacklist keywords
-        for node in self.nodes:
-            flag = True
-            for k in self.exclusion:
-                if k in node['name'].lower() or k in node['server'].lower():
-                    self.log("Drop: {}".format(node['name']))
-                    flag = False
-                    break
-            if flag:
-                nodes_good.append(node)
 
-        self.nodes = nodes_good
-        nodes_good = []
+        # blacklist keywords
+        if self.exclusion:
+            for node in self.nodes:
+                flag = True
+                for k in self.exclusion:
+                    if k in node['name'].lower() or k in node['server'].lower():
+                        self.log("Drop: {}".format(node['name']))
+                        flag = False
+                        break
+                if flag:
+                    nodes_good.append(node)
+
+            self.nodes = nodes_good
+            nodes_good = []
 
         # whitelist keywords
-        for node in self.nodes:
-            for k in self.inclusion:
-                if k in node['name'].lower() or k in node['server'].lower():
-                    nodes_good.append(node)
-                    break
+        if self.inclusion:
+            for node in self.nodes:
+                for k in self.inclusion:
+                    if k in node['name'].lower() or k in node['server'].lower():
+                        nodes_good.append(node)
+                        break
 
-        self.nodes = nodes_good
-        nodes_good = []
+            self.nodes = nodes_good
+            nodes_good = []
 
         # deduplicate
         if self.dedup:
