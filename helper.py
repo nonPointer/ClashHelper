@@ -55,41 +55,48 @@ class Site:
         nodes_good = []
         # blacklist keywords
         for node in self.nodes:
+            flag = True
             for k in self.exclusion:
                 if k in node['name'].lower() or k in node['server'].lower():
-                    self.nodes.remove(node)
                     self.log("Drop: {}".format(node['name']))
+                    flag = False
                     break
+            if flag:
+                nodes_good.append(node)
+
+        self.nodes = nodes_good
+        nodes_good = []
 
         # whitelist keywords
         for node in self.nodes:
             for k in self.inclusion:
                 if k in node['name'].lower() or k in node['server'].lower():
                     nodes_good.append(node)
-                    # site.log("Take: {}".format(node['name']))
                     break
+
+        self.nodes = nodes_good
+        nodes_good = []
 
         # deduplicate
         if self.dedup:
             used = set()
-            for node in nodes_good:
+            for node in self.nodes:
                 try:
                     ip = socket.getaddrinfo(node['server'], None)[0][4][0]
                     p = (ip, node['port'])
                     if p in used:
                         self.log("Drop: {}, dup!".format(node['name']))
-                        nodes_good.remove(node)
                     else:
-                        site.log("Take: {}".format(node['name']))
+                        self.log("Take: {}".format(node['name']))
+                        nodes_good.append(node)
                         used.add(p)
                 except:
                     self.log(f"Failed to resolve node {node['name']}: {node['server']}")
+            self.nodes = nodes_good
         else:
             self.log("Dedup disabled")
-            for node in nodes_good:
+            for node in self.nodes:
                 self.log("Take: {}".format(node['name']))
-
-        self.nodes = nodes_good
 
     def get_titles(self):
         return list(map(lambda x: x['name'], self.nodes))
