@@ -36,15 +36,15 @@ class Site:
             assert status_code == 200
             self.data = yaml.load(r.text, Loader=FullLoader)
             # 缓存
-            with open("{}.yaml".format(group), "w", encoding="utf-8") as f:
+            with open("{}.yaml".format(name), "w", encoding="utf-8") as f:
                 f.write(r.text)
         except Exception as e:
             if status_code != 200:
                 self.log(f"HTTP Error: {status_code}")
             self.log("加载异常")
-            if os.path.exists("{}.yaml".format(group)):
+            if os.path.exists("{}.yaml".format(name)):
                 self.log("使用上次缓存")
-                with open("{}.yaml".format(group), "r", encoding="utf-8") as f:
+                with open("{}.yaml".format(name), "r", encoding="utf-8") as f:
                     self.data = yaml.load(f, Loader=FullLoader)
             else:
                 self.data = None
