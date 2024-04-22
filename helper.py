@@ -130,9 +130,13 @@ with open(sys.argv[1], "r", encoding="utf-8") as f:
 
 for site in sites:
     if site.data != None:
-        site.purge()
-        config['proxies'] += site.nodes
-        config['proxy-groups'][list(map(lambda x: x['name'], config['proxy-groups'])).index(site.group)]['proxies'] += site.get_titles()
+        try:
+            site.purge()
+            config['proxies'] += site.nodes
+            config['proxy-groups'][list(map(lambda x: x['name'], config['proxy-groups'])).index(site.group)]['proxies'] += site.get_titles()
+        except Exception as e:
+            self.log(f"Failed to process {site.name}")
+            self.log(e)
 
 # 对节点名去重
 config['proxies'] = list({x['name']: x for x in config['proxies']}.values())
