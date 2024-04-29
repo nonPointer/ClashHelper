@@ -135,8 +135,8 @@ for site in sites:
             config['proxies'] += site.nodes
             config['proxy-groups'][list(map(lambda x: x['name'], config['proxy-groups'])).index(site.group)]['proxies'] += site.get_titles()
         except Exception as e:
-            self.log(f"Failed to process {site.name}")
-            self.log(e)
+            site.log(f"Failed to process {site.name}")
+            site.log(e)
 
 # 对节点名去重
 config['proxies'] = list({x['name']: x for x in config['proxies']}.values())
