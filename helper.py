@@ -35,7 +35,7 @@ class Site:
                 headers = {
                     "User-Agent": "ClashForAndroid/2.5.12",  # V2board 根据 UA 下发配置
                 }
-                r = requests.get(url, headers=headers)
+                r = requests.get(url, headers=headers, timeout=5)
                 status_code = r.status_code
                 assert status_code == 200
                 self.data = yaml.load(r.text, Loader=FullLoader)
