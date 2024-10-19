@@ -26,22 +26,32 @@ class Site:
         self.nodes = []
         self.dedup = dedup
 
+        retries = 3
         status_code = 200
-        try:
-            headers = {
-                "User-Agent": "ClashForAndroid/2.5.12",  # V2board 根据 UA 下发配置
-            }
-            r = requests.get(url, headers=headers)
-            status_code = r.status_code
-            assert status_code == 200
-            self.data = yaml.load(r.text, Loader=FullLoader)
-            # 缓存
-            with open("{}.yaml".format(name), "w", encoding="utf-8") as f:
-                f.write(r.text)
-        except Exception as e:
+        fin = False
+        while retries:
+            retries -= 1
+            try:
+                headers = {
+                    "User-Agent": "ClashForAndroid/2.5.12",  # V2board 根据 UA 下发配置
+                }
+                r = requests.get(url, headers=headers)
+                status_code = r.status_code
+                assert status_code == 200
+                self.data = yaml.load(r.text, Loader=FullLoader)
+                # 缓存
+                with open("{}.yaml".format(name), "w", encoding="utf-8") as f:
+                    f.write(r.text)
+                fin = True
+            except:
+                pass
+        
+        if fin:
+            pass
+        else:
+            self.log("加载异常")
             if status_code != 200:
                 self.log(f"HTTP Error: {status_code}")
-            self.log("加载异常")
             if os.path.exists("{}.yaml".format(name)):
                 self.log("使用上次缓存")
                 with open("{}.yaml".format(name), "r", encoding="utf-8") as f:
