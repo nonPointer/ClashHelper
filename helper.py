@@ -138,6 +138,10 @@ with open("sites.yaml", "r", encoding="utf-8") as f:
 with open(sys.argv[1], "r", encoding="utf-8") as f:
     config = yaml.load(f, Loader=FullLoader)
 
+# Ensure 'proxies' is initialized
+if 'proxies' not in config or config['proxies'] is None:
+    config['proxies'] = []
+
 for site in sites:
     if site.data != None:
         try:
