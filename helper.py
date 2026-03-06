@@ -43,7 +43,8 @@ class Site:
                 with open("{}.yaml".format(name), "w", encoding="utf-8") as f:
                     f.write(r.text)
                 fin = True
-            except:
+                break
+            except Exception:
                 pass
         
         if fin:
@@ -61,6 +62,9 @@ class Site:
                 self.log("节点组为空")
 
     def purge(self):
+        if 'proxies' not in self.data or self.data['proxies'] is None:
+            self.log("No proxies found in data")
+            return
         self.nodes = self.data['proxies']
         nodes_good = []
 
@@ -103,8 +107,8 @@ class Site:
                         self.log("Take: {}".format(node['name']))
                         nodes_good.append(node)
                         used.add(p)
-                except:
-                    self.log(f"Failed to resolve node {node['name']}: {node['server']}")
+                except Exception as e:
+                    self.log(f"Failed to resolve node {node['name']}: {node['server']} ({e})")
             self.nodes = nodes_good
         else:
             self.log("Dedup disabled")
@@ -143,7 +147,7 @@ if 'proxies' not in config or config['proxies'] is None:
     config['proxies'] = []
 
 for site in sites:
-    if site.data != None:
+    if site.data is not None:
         try:
             site.purge()
             config['proxies'] += site.nodes
@@ -154,6 +158,17 @@ for site in sites:
 
 # 对节点名去重
 config['proxies'] = list({x['name']: x for x in config['proxies']}.values())
+
+# 对代理组中的节点引用去重
+for group in config.get('proxy-groups', []):
+    if 'proxies' in group and group['proxies']:
+        seen = set()
+        deduped = []
+        for name in group['proxies']:
+            if name not in seen:
+                seen.add(name)
+                deduped.append(name)
+        group['proxies'] = deduped
 
 output_file = sys.argv[2] if len(sys.argv) == 3 else "out.yaml"
 with open(output_file, "w", encoding="utf-8") as f:
